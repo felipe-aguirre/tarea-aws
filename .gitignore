@@ -1,2 +1,4 @@
-data.py
+.DS_Store
+credentials
 __pycache__
+.vscode
