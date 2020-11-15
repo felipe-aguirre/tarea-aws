@@ -4,11 +4,11 @@ AUTH_PATTERN = re.compile("(.+?)=(.*)")
 
 # Datos Iniciales:
 # Bucket: Nombre de Bucket en que se ubican las imágenes
-BUCKET = 5
+BUCKET = 'testsoftware1'
 # Photo: Nombre de la imagen incluida en el Bucket anterior, debe contener la extensión
-PHOTO = list()
+PHOTO = 'base.png'
 # Base: Texto que se desea encontrar en la imágen
-BASE = ""
+BASE = "It's monday but keep smiling"
 
 
 
