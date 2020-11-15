@@ -34,11 +34,11 @@ La aplicación requiere poseer una cuenta en AWS y acceso a las credenciales de 
 Dado a que el requerimiento exacto es `Verificar si en el texto de imagen de prueba está presente el texto de imagen de control.` se hacen los siguientes supuestos:
 
 - Para efectos del programa y la incertidumbre que existe en el orden en que AWS rekognition lee la imagen, dependiendo de la orientación, se asume que no es requisito que la palabra *base* se encuentre en el mismo orden en la imagen. 
-  - Ejemplo: la Imagen de prueba [ok-extra-between.jpg]("images/ok-extra-between.jpg") si se considera válida al detectar `It's monday but keep smiling`
+  - Ejemplo: la Imagen de prueba [ok-extra-between.jpg](images/ok-extra-between.jpg) si se considera válida al detectar `It's monday but keep smiling`
 - Del mismo modo, se asume que cada palabra del texto base puede aparecer más de una vez en la imagen.
-  - Ejemplo: La imágen de prueba [ok-repeated.jpeg]("images/ok-repeated.jpeg") si se considera válida al detectar `It's monday but keep smiling`
+  - Ejemplo: La imágen de prueba [ok-repeated.jpeg](images/ok-repeated.jpeg) si se considera válida al detectar `It's monday but keep smiling`
 - No es necesario que exclusivamente el texto de prueba se encuentre en la imagen:
-  - Ejemplo: La imágen de prueba [ok-extra.png]("images/ok-extra.png") si se considera válida al detectar `It's monday but keep smiling`
+  - Ejemplo: La imágen de prueba [ok-extra.png](images/ok-extra.png) si se considera válida al detectar `It's monday but keep smiling`
 
 
 
