@@ -1,7 +1,17 @@
 import boto3
-from menu import *
 import re
 AUTH_PATTERN = re.compile("(.+?)=(.*)")
+
+# Datos Iniciales:
+# Bucket: Nombre de Bucket en que se ubican las imágenes
+BUCKET = 5
+# Photo: Nombre de la imagen incluida en el Bucket anterior, debe contener la extensión
+PHOTO = list()
+# Base: Texto que se desea encontrar en la imágen
+BASE = ""
+
+
+
 # Logger
 import logging
 logger = logging.getLogger('Tarea AWS')
@@ -13,17 +23,25 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
-# Revisor: Check si la imagen tiene la frase base
+# Import funciones auxiliares de UI
+from menu import *
+
+
+
+# Funcion - Revisor: Check si la imagen tiene la frase base
 def checker(textDetections, base):
     palabras = base.lower().strip().split()
+    promedio = list()
     if len(palabras) == 0:
-        return False
+        return "No se detectó texto alguno en la imágen"
     for word in textDetections:
         if word['DetectedText'].lower() in palabras and word['Confidence']>97:
             palabras.remove(word['DetectedText'].lower())
+            promedio.append(word['Confidence'])
     if len(palabras) == 0:
-        return True
-    return False
+        promedio = sum(promedio)/len(promedio)
+        return "La palabra {} fue encontrada en la imágen con un {} de acierto promedio por palabra.".format(base,promedio)
+    return "El texto detectado no corresponde al texto base {}".format(base)
 
 def detect_text(selection, credenciales):
     if len(credenciales) == 3:
@@ -60,8 +78,36 @@ def detect_text(selection, credenciales):
     revisor = checker(textDetections,selection['base'])
     return revisor
 
-# UI
+# Funcion - Validador: Verifica si el formato de la entrada es correcta
+def validador(entrada):
+    if type(entrada['bucket']) != str:
+        print("Nombre de bucket debe ser un String, verificar script linea 7")
+        logger.debug("FATAL ERROR - type of BUCKET not string")
+        return False
+    if type(entrada['photo']) != str:
+        print("Nombre de imágen debe ser un String, verificar script linea 9")
+        logger.debug("FATAL ERROR - type of PHOTO not string")
+        return False
+    if type(entrada['base']) != str:
+        print("Texto base debe ser un String, verificar script linea 11")
+        logger.debug("FATAL ERROR - type of BASE not string")
+        return False
+    if len(entrada['bucket']) == 0:
+        print("Nombre de bucket no puede ser un texto vacío, verificar script linea 7")
+        logger.debug("FATAL ERROR - length of BUCKET 0")
+        return False
+    if len(entrada['photo']) == 0:
+        print("Nombre de imágen no puede ser un texto vacío, verificar script linea 9")
+        logger.debug("FATAL ERROR - length of PHOTO 0")
+        return False
+    if len(entrada['base']) == 0:
+        print("Texto base no puede ser un texto vacío, verificar script linea 9")
+        logger.debug("FATAL ERROR - length of BUCKET 0")
+        return False
+    return True
 def main():
+
+    # REVISIÓN formato archivo credentials
     logger.debug("START apertura archivo credenciales.")
     try:
         ARCHIVO = open('credentials', encoding="utf-8")
@@ -87,7 +133,7 @@ def main():
             credenciales[matcher.group(1)] = matcher.group(2)
     if ['aws_access_key_id','aws_secret_access_key'] == sorted(credenciales.keys()):
         logger.debug("WARNING - credentials sin session_token")
-        print("Advertencia - Su archivo credentials no contiene el session_token\nLa sesión no funcionará si está intentando usar credenciales temporales.")
+        print("Advertencia - Su archivo credentials no contiene el session_token\nLa aplicación no funcionará si está intentando usar credenciales temporales.")
     elif ['aws_access_key_id','aws_secret_access_key', 'aws_session_token'] == sorted(credenciales.keys()):
         logger.debug('Formato válido de aws_access_key_id, aws_secret_access_key y aws_session_token')
     else:
@@ -96,31 +142,26 @@ def main():
         return
     
     logger.debug("END revisión validez credenciales")
+
     logger.debug("START ejecución Interfaz")
+    try:
+        defaultData = {
+            'bucket': BUCKET,
+            'photo': PHOTO,
+            'base': BASE
+        }
+    except Exception as error:
+        print("Hubo un error al definir variables preestablecidas, revisar debug.log")
+        logger.debug("FATAL ERROR - "+error)
 
-
-    # OK Verificar que no está vacio
-    # OK Verificar que existe el bucket y la foto
-    # Habilitar loop por si hay mas de una foto
-    # Datos de prueba actuales
-    defaultData = {
-        'bucket': 'testsoftware1',
-        'photo': 'text.png',
-        'base': "It's monday but keep smiling"
-    }
-    # verificar que default data sean string y que tenga las llaves correspondientes
-    
-    logger.debug("Default bucket: "+defaultData['bucket'])
-    logger.debug("Default photo: "+defaultData['photo'])
-    logger.debug("Default base: "+defaultData['base'])
+    logger.debug("Default bucket: "+str(defaultData['bucket']))
+    logger.debug("Default photo: "+str(defaultData['photo']))
+    logger.debug("Default base: "+str(defaultData['base']))
     selection = menu(defaultData)
     logger.debug("Usuario eligió analizar:")
     while selection != 'EXIT':
-        if len(selection['base'] != 0):
+        if validador(selection):
             print(detect_text(selection,credenciales))
-        else:
-            print("La palabra base no puede estar vacía - revise los valores preestablecidos en el código")
-            logger.debug("ERROR - valor actual de defaultData['base'] no puede ser un string vacío")
         selection = review(defaultData)
         logger.debug("Usuario eligió analizar"+selection)
     logger.debug("Usuario decidió salir mediante el comando EXIT.")

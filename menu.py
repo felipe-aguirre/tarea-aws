@@ -29,7 +29,7 @@ def review(defaultData):
 def menu(defaultData):
     print("")
     print("Bienvenido al script de AWS rekognition\n¿Desea usar los datos preestablecidos? \n\nDatos preestablecidos:")
-    print("\t- Bucket: "+defaultData['bucket'])
-    print("\t- Imágen: "+defaultData['photo'])
-    print("\t- Texto base: "+defaultData['base']+"\n")
+    print("\t- Bucket: "+str(defaultData['bucket']))
+    print("\t- Imágen: "+str(defaultData['photo']))
+    print("\t- Texto base: "+str(defaultData['base']+"\n"))
     return review(defaultData)
