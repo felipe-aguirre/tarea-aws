@@ -33,15 +33,15 @@ def checker(textDetections, base):
     palabras = base.lower().strip().split()
     promedio = list()
     if len(palabras) == 0:
-        return "No se detectó texto alguno en la imágen"
+        return "Sin texto\nNo se detectó texto alguno en la imágen\n"
     for word in textDetections:
         if word['DetectedText'].lower() in palabras and word['Confidence']>97:
             palabras.remove(word['DetectedText'].lower())
             promedio.append(word['Confidence'])
     if len(palabras) == 0:
-        promedio = sum(promedio)/len(promedio)
-        return "La palabra {} fue encontrada en la imágen con un {} de acierto promedio por palabra.".format(base,promedio)
-    return "El texto detectado no corresponde al texto base {}".format(base)
+        promedio = round(sum(promedio)/len(promedio),2)
+        return "Encontrado!\nLa palabra {} fue encontrada en la imágen con un {}% de acierto promedio por palabra.\n".format(base,promedio)
+    return "No encontrado\n El texto detectado no corresponde al texto base {}.\n".format(base)
 
 def detect_text(selection, credenciales):
     if len(credenciales) == 3:
@@ -158,12 +158,12 @@ def main():
     logger.debug("Default photo: "+str(defaultData['photo']))
     logger.debug("Default base: "+str(defaultData['base']))
     selection = menu(defaultData)
-    logger.debug("Usuario eligió analizar:")
+    logger.debug("Usuario eligió analizar: "+str(selection))
     while selection != 'EXIT':
         if validador(selection):
             print(detect_text(selection,credenciales))
         selection = review(defaultData)
-        logger.debug("Usuario eligió analizar"+selection)
+        logger.debug("Usuario eligió analizar: "+str(selection))
     logger.debug("Usuario decidió salir mediante el comando EXIT.")
     logger.debug("FIN DEL PROGRAMA")
 
